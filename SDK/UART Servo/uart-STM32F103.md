@@ -1,82 +1,72 @@
-# 总线伺服舵机SDK使用手册（STM32F103）
+# UART Bus Servo SDK User Manual (STM32F103)
 
-## 1.概述
+## 1.Overview
 
-本SDK提供了基于[总线伺服舵机通信协议](https://wiki.fashionrobo.com/uartbasic/uart-protocol/)的STM32F103的API函数，适用于所有总线伺服舵机型号。
+This SDK provides STM32F103 API functions based on the [UART bus servo communication protocol](https://wiki.fashionstar.com.hk/protocols), It applies to all Fashion Star UART bus servo models.
 
+### 1.1 PC Configuration Tool
 
+The PC configuration tool can be used to debug bus servos and test their functions.
 
-### 1.1.上位机软件
+- PC Configuration Tool: [FashionStar UART Bus Servo PC Software](https://wiki.fashionstar.com.hk/download/1094/?tmstv=1765252343)
 
-上位机软件可以调试总线伺服舵机，测试总线伺服舵机的功能。
+- User guide: [Bus Servo PC Software Manual](https://wiki.fashionstar.com.hk/pc-configuration-user-manual)
 
-- 上位机软件：[FashionStar UART总线伺服舵机上位机软件](https://fashionrobo.com/downloadcenter/)
+### 1.2 SDK
 
-- 使用说明：[总线伺服舵机上位机软件使用说明](https://wiki.fashionrobo.com/uartbasic/uart-servo-software/)
+Example projects and APIs mentioned in this document can be downloaded here:
 
-### 1.2.SDK
+- STM32F103 SDK download link: [SDK for STM32F103](https://wiki.fashionstar.com.hk/download/1318/?tmstv=1765252679)
 
-本文例程、API下载。
+### 1.3 Development Tools
 
-- STM32F103_SDK下载链接：[SDK for STM32F103](https://fashionrobo.com/downloadcenter/)
+The UC-01 bus servo adapter board uses a `CH340` USB-to-TTL chip. You need to install its driver on Windows. [Check if the driver is installed correctly](https://jingyan.baidu.com/article/00a07f3872a90982d028dcb9.html)
 
++ keil5: [keil5下载链接](https://fashionrobo.com/wp-content/uploads/download/keil5.zip)
++ ST-Link driver: [ST-Link driver download link](https://fashionrobo.com/wp-content/uploads/download/STLinkV2.zip)
++ Serial debug assistant: [XCOM V2.2 download link](https://www.amobbs.com/forum.php?mod=attachment&aid=NDQxNzc5fDE5NzMzYjQ1fDE1NzY2NTQ4NTN8MHw1NzAzODMz)
++ USB-to-TTL driver: [CH340 driver download link](https://fashionrobo.com/wp-content/uploads/download/CH341SER.zip)
 
+### 1.4 Illustrations
 
-### 1.3.开发软件
+HP8-U45-M UART bus servo<img src="./images/u45-slide-01.png" style="zoom: 50%;" />
 
-总线伺服舵机转接板使用的USB转TTL串口芯片是`CH340`，需要在Windows上安装驱动。[检查驱动是否安装成功](https://jingyan.baidu.com/article/00a07f3872a90982d028dcb9.html)
+STM32 all-in-one main control board
 
-+ keil5：[keil5下载链接](https://fashionrobo.com/wp-content/uploads/download/keil5.zip)
-+ STLink驱动：[STLink驱动下载链接](https://fashionrobo.com/wp-content/uploads/download/STLinkV2.zip)
-+ 串口调试助手：[XCOM V2.2下载链接](https://www.amobbs.com/forum.php?mod=attachment&aid=NDQxNzc5fDE5NzMzYjQ1fDE1NzY2NTQ4NTN8MHw1NzAzODMz)
-+ 串口调试驱动：[CH340驱动下载链接](https://fashionrobo.com/wp-content/uploads/download/CH341SER.zip)
+<img src="./images/1.3.png" style="zoom: 33%;" />
 
+`UC-01` bus servo adapter board
 
-
-### 1.4.图例
-
-HP8-U45-M总线伺服舵机
-
-![](./images/u45-slide-01.png)
-
-STM32多合一主控板
-
-![](./images/1.3.png)
-
-总线伺服舵机转接板UC-01
-
-![](./images/1.4.png)
+<img src="./images/1.4.png" style="zoom:50%;" />
 
 STM32F103C8T6
 
-![](./images/1.5.png)
-
-## 2.接线说明
-
-### 2.1.硬件准备
-
-|              名称              |                         说明                          |                             备注                             |
-| :----------------------------: | :---------------------------------------------------: | :----------------------------------------------------------: |
-|          总线伺服舵机          |            所有型号的通信协议都是统一的。             |                                                              |
-|    总线伺服舵机转接板UC-01     | 提供舵机工作所需的<br> **电源接口** 和 **通信接口**。 |                             必备                             |
-|      STM32F103C8T6开发板       |                     用于MCU编程。                     |                     同芯片的开发板适用。                     |
-|              电脑              |             用于软件开发、打印调试信息。              |                                                              |
-|           ST-Link/v2           |             STM32在线仿真器下载器/调试器              |                其他STM32下载器/调试器也适用。                |
-|  USB转TTL串口模块<br>（可选）  |        用于电脑与STM32串口通信，打印调试信息。        |             并非必选，主用于开发过程中打印信息。             |
-| STM32多合一主控板<br/>（可选） | 集成了总线伺服舵机转接板UC-01和STM32F103C8T6的功能。  | 可直接代替总线伺服舵机转接板UC-01和STM32F103C8T6开发板进行开发。 |
-
-- 零基础推荐的开发方式为使用STM32多合一主控板进行开发；该主控板集成了 **总线伺服舵机转接板UC-01** 和 **STM32F103C8T6** 的功能，并且引出了开发中常用的接口，可有效缩短开发时间。
-- 使用 **总线伺服舵机转接板UC-01** 和 **STM32F103C8T开发板** 组合开发，更适用于多种不同的开发环境。
+<img src="./images/1.5.png" style="zoom:33%;" />
 
 
 
+## 2.Wiring Instructions
 
+### 2.1 Hardware Preparation
 
-### 2.2.STM32与STLinkV2的接线
+| Name                                   | Description                                                  | Notes                                                        |
+| -------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Bus servo                              | All models share the same communication protocol.            |                                                              |
+| UC-01 bus servo adapter board          | Provides the servo’s required **power interface** and **communication interface** | Required                                                     |
+| STM32F103C8T6 dev board                | Used for MCU programming.                                    | Any dev board with the same MCU can be used.                 |
+| PC                                     | Used for software development and printing debug logs.       |                                                              |
+| ST-Link/v2                             | STM32 on-chip programmer / debugger                          | Other STM32 programmers/debuggers are also fine.             |
+| USB-to-TTL module (optional)           | Connects PC and STM32 UART, used to print debug logs.        | Optional; mainly used for logging during development.        |
+| STM32 all-in-one main board (optional) | Integrates both UC-01 and STM32F103C8T6 functions.           | Can directly replace the UC-01 + STM32F103C8T6 dev board combo. |
 
-通过STLinkV2给STM32下载固件。
+- For beginners, we recommend using the STM32 all-in-one main control board. It integrates the **UC-01 bus servo adapter board** and **STM32F103C8T6**, and exposes commonly used interfaces to significantly shorten development time.
+- Using the **UC-01** together with an **STM32F103C8T6** dev board is more flexible for different environments.
 
-*STM32与STLinkV2的接线图*
+### 2.2 Wiring STM32 to ST-Link V2
+
+Use ST-Link V2 to download firmware to the STM32.
+
+- STM32 ↔ ST-Link V2 wiring
 
 | STM32       | STLinkV2 |
 | ----------- | -------- |
@@ -87,76 +77,70 @@ STM32F103C8T6
 
 ![img](images/wW1fYSVX62cHDzg.jpg)
 
+### 2.3 Hardware Wiring
 
+The STM32F103 has three UART peripherals: UART1, UART2, and UART3. In this SDK, they are used as follows:
 
+* `UART1` Connected to the UC-01 bus servo adapter board, used to control bus servos
+* `UART2` Connected to a USB-to-TTL module for logging (optional)
+* `UART3`Not used
 
+**Wiring to the bus servo**
 
-### 2.3.硬件接线
+UART1 is connected to the TTL port of the UC-01 and used to control bus servos.
 
-STM32F103一共有三个串口资源，分别为UART1、UART2、UART3。在舵机SDK内，约定三个串口的用途分别为如下所示：
+> [!NOTE]
+>
+> If using the **PTC-32** development board, you can use it directly without needing to set jumpers.
 
-* `UART1` 接总线伺服舵机转接板，控制总线伺服舵机
-* `UART2` 接USB转TTL模块，用于日志输出（可选）
-* `UART3` 未接
+- STM32 ↔ UC-01 wiring
 
-
-
-**与总线伺服舵机的接线**
-
-串口1和总线伺服舵机转接板的TTL接口相连，用于控制总线伺服舵机。
-
-<!--若使用PTC-32开发板，直接使用即可，不需跳线-->
-
-*STM32与总线伺服舵机转接板接线图*
-
-| STM32F103 GPIO    | 总线伺服舵机转接板 |
-| ----------------- | ------------------ |
-| PA_9   (UART1 Tx) | Rx                 |
-| PA_10 (UART1 Rx)  | Tx                 |
-| 5v                | 5v                 |
-| GND               | GND                |
+| STM32F103 GPIO    | UC-01 bus servo adapter |
+| ----------------- | ----------------------- |
+| PA_9   (UART1 Tx) | Rx                      |
+| PA_10 (UART1 Rx)  | Tx                      |
+| 5v                | 5v                      |
+| GND               | GND                     |
 
 ![images-20210421174433503](images/PoXZktuvmW57Y9L.png)
 
 ![images-20210421174418516](images/ysrDXAGb52NcnzR.png)
 
+**STM32 ↔ USB-to-TTL module (optional)**
+
+UART2 on the STM32 is connected to the USB-to-TTL module, which sends log data to the PC.
+
+- STM32 ↔ USB-to-TTL wiring
 
 
-**STM32与USB转TTL模块（可选）**
+| STM32F103 GPIO  | USB-to-TTL module |
+| --------------- | ----------------- |
+| PA_2 (UART2 Tx) | Rx                |
+| PA_3 (UART2 Rx) | Tx                |
+| GND             | GND               |
 
-STM32的串口2与USB转TTL模块模块相连，给PC发送日志信息。
-
-*STM32与USB转TTL接线图*
-
-| STM32F103 GPIO  | USB转TTL模块 |
-| --------------- | ------------ |
-| PA_2 (UART2 Tx) | Rx           |
-| PA_3 (UART2 Rx) | Tx           |
-| GND             | GND          |
-
-USB转TTL模块的USB口与电脑的USB口相连。
+The USB port of the USB-to-TTL module connects to a USB port on the PC.
 
 ![w](images/QzSpn52ZBRq7Afj.png)
 
-### 2.4.图例
+### 2.4 Illustrations
 
-![](./images/1.png)
+<img src="./images/1.png" alt="1" style="zoom:67%;" />
 
 ![](./images/2.png)
 
-## 3.开发环境配置
 
 
+## 3.Development Environment Setup
 
-### 3.1.KEIL5配置
+### 3.1.KEIL5 Configuration
 
-配置软件部分步骤
+Steps for configuring the software:
 
-下载并安装KEIL5和STM32F1芯片包。
-
-下载SDK并解压缩包： **fashionstar-uart-servo-stm32f103-master**
-
-使用KEIL5打开STM32例程的工程文件（以通信检测为例），文件路径如下：
+1. Download and install KEIL5 and the STM32F1 device pack.
+2. Download the SDK and unzip it: **fashionstar-uart-servo-stm32f103-master**
+3. Open the STM32 example project with KEIL5 (using the “communication check” example as reference).
+    Project path:
 
 ```
 fashionstar-uart-servo-stm32f103-master\UART总线伺服舵机STM32F103 SDK使用手册\2.1.舵机通讯检测\源代码\FashionStarUartServo\Project\FashionStarUartServo.uvprojx
@@ -166,7 +150,7 @@ fashionstar-uart-servo-stm32f103-master\UART总线伺服舵机STM32F103 SDK使�
 
 ![](./images/6.png)
 
-选择编译器 Use default compiler version 5。
+Choose compiler: **Use default compiler version 5**
 
 ![](./images/7.png)
 
@@ -174,289 +158,245 @@ fashionstar-uart-servo-stm32f103-master\UART总线伺服舵机STM32F103 SDK使�
 
 ![](./images/8.png)
 
-选择实际使用的Debugger。本例程使用ST-Link。
+Select the actual debugger you are using. In this example, we use ST-Link.
 
 ![](./images/9.png)
 
-### 3.2.编译下载代码
+### 3.2 Build and Download Firmware
 
 ![](./images/10.png)
 
-输出编译结果。
+Build the project and check the output.
 
 ![](./images/11.png)
 
-将ST-Link与电脑的USB相连接。
-
-固件下载到STM32。
+Connect ST-Link to the PC via USB. Download the firmware to the STM32.
 
 ![](./images/12.png)
 
-按下STM32开发板上的 reset 按键。STM32执行新写入的固件。
+Press the **reset** button on the STM32 dev board. The STM32 will start executing the newly-programmed firmware.
 
-![](.\images\reset.png)
+<img src=".\images\reset.png" style="zoom: 50%;" />
 
-### 3.3.拓展-文件结构讲解
+### 3.3 Extra – Project Structure Overview
 
-**工程结构**
-
-以例程 **舵机通讯检测** 为例，讲解STM32的工程结构。
-
-打开文件夹 *舵机通讯检测/源代码/FashionStarUartServo*
-
-目录结构如下: 
+**Project structure**
 
 * `Project` 
 
-  Keil5的工程文件，点击 `FashionStarUartServo.uvprojx`   即可通过Keil5打开此工程。
+  KEIL5 project files. Double-click `FashionStarUartServo.uvprojx` to open.
 
 * `User`
 
-  主程序以及用户自定义库
+  Main program and user-defined libraries
 
-  * `main.c` 用户主程序
-  * 用户自定义的库文件，例如*舵机驱动库*等
+  * `main.c` : User main program
+  * User-defined libraries (for example: Servo driver library, etc.)
 
 * `Libraries` 
 
-  * `CMSIS`：存放ARM公司为cm3内核专一定制的内核文件接口
-  * `FWLIB`：存放STM32的外设库
+  * `CMSIS`：ARM CM3 core support files from ARM
+  * `FWLIB`：STM32 standard peripheral library
 
-* `Listings` ：该目录是MDK生成信息输出目录，存放代码分布（.map和.lst）
+- `Listings`: This directory is the MDK-generated information output directory, storing code distribution files (.map and .lst).
+- `Output`: This directory is the MDK-generated information output directory, storing object files (.o), debugging files (.axf), download files (.hex), dependency files (.d), etc.
 
-* `Output` 该目录是MDK生成信息输出目录，存放目标文件(.o)、调试文件(.axf)、下载文件(.hex)、依赖文件（.d）等。
+**User-defined library files**
 
-
-
-**用户自定义库文件**
-
-User文件夹 工程结构介绍
+Overview of the User directory:
 
 * `sys_tick` 
 
-  管理系统时间。通过配置系统定时器中断，实现了延时以及倒计时的逻辑。
+  Manages system time. Uses SysTick interrupts for delay and countdown logic.
 
 * `ring_buffer` 
 
-  用C语言实现了环形缓冲队列。用于存放管理串口通信的字节流。同时还具备向缓冲队列读取/写入特定数据类型的数值的功能。
+  A ring-buffer queue implemented in C. Used to store/manage UART data streams, and supports reading/writing various data types.
 
 * `usart`
 
-  串口通信的库。通过配置宏，可以方便的打开关闭STM32F103C8开发板上三个USART资源。
+  UART communication library. Via macros you can enable/disable the three USART resources on the STM32F103C8 dev board.
 
 * `fashion_star_uart_servo` 
 
-  封装了Fashion Star 总线伺服舵机的通信协议，是舵机STM32F103版本的SDK。
+  Encapsulates the `Fashion Star` bus servo communication protocol. This is the STM32F103-side SDK for bus servos.
 
 * `main.c`
 
-  主程序。程序入口。
+  Main program entry.
 
-`User` 文件目录树
+`User` directory tree:
 
 ```
-├── fashion_star_uart_servo 舵机驱动库
+├── fashion_star_uart_servo Servo driver library
 │   ├── fashion_star_uart_servo.c
 │   └── fashion_star_uart_servo.h
-├── main.c 主程序
-├── ring_buffer 环形缓冲队列驱动库
+├── main.c Main program
+├── ring_buffer Ring-buffer driver library
 │   ├── README.md
 │   ├── ring_buffer.c
 │   └── ring_buffer.h
 ├── stm32f10x_conf.h
-├── sys_tick　系统时钟
+├── sys_tick　System tick
 │   ├── sys_tick.c
 │   └── sys_tick.h
-└── usart 串口通信
+└── usart UART communication
     ├── README.md
     ├── usart.c
     └── usart.h
 ```
 
-## 4.通讯检测
-
-检查舵机是否在线，就需要用到通讯检测指令。
-
-- 如果ID号的舵机存在且在线，舵机在接收到通讯检测指令时，会发送一个响应包。
-
-- 如果ID号的舵机不存在或者掉线，就不会有舵机发送响应数据包。
-
-![<img src="" style="zoom:60%;" />](images/3.1.png)
 
 
+## 4. Ping
 
+To check whether a servo is online, use the **Ping** command.
 
+- If a servo with that ID exists and is online, it will send a response packet after receiving the **Ping** command.
 
-### 4.1.通讯检测
+- If the servo ID does not exist or the servo is offline, no response packet will be received.
 
-**函数原型**
+<img src="./images/3.1.png" alt="3.1" style="zoom:50%;" />
+
+### 4.1 Ping
+
+**Function prototype**
 
 ```C
 FSUS_STATUS FSUS_Ping(Usart_DataTypeDef *usart, uint8_t servo_id);
 ```
 
-- `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
-- `servo_id` 舵机的ID
+- `usart` : Pointer to the UART data object used for servo control`Usart_DataTypeDef`
+- `servo_id` 
 
+**Usage example**
 
-
-**使用示例**
-
-舵机通讯检测函数`FSUS_Ping`，依次传入串口数据结构体指针`servoUsart`，还有舵机的ID号`servoId`。
+The Ping function `FSUS_Ping` takes the UART data structure pointer `servoUsart` and the servo ID `servoId`:
 
 ```c
 statusCode = FSUS_Ping(servoUsart, servoId);
 ```
 
-`statusCode`是返回的状态码`FSUS_STATUS`，如果是请求成功则返回`0`，如果是其他的数值则意味着舵机通讯检测失败。可以在`fashion_star_uart_servo.h` 文件里面查阅不同的statusCode对应的错误。
+`statusCode` is of type `FSUS_STATUS`. If the request succeeds, it returns `0`. Any other value indicates a communication failure. You can check `fashion_star_uart_servo.h` for the meaning of each status code.
 
 ```C
-// FSUS状态码
+// FSUS status codes
 #define FSUS_STATUS uint8_t
-#define FSUS_STATUS_SUCCESS 0 // 设置/读取成功
-#define FSUS_STATUS_FAIL 1 // 设置/读取失败
-#define FSUS_STATUS_TIMEOUT 2 // 等待超时 
-#define FSUS_STATUS_WRONG_RESPONSE_HEADER 3 // 响应头不对
-#define FSUS_STATUS_UNKOWN_CMD_ID 4 // 未知的控制指令
-#define FSUS_STATUS_SIZE_TOO_BIG 5 // 参数的size大于FSUS_PACK_RESPONSE_MAX_SIZE里面的限制
-#define FSUS_STATUS_CHECKSUM_ERROR 6 // 校验和错误
-#define FSUS_STATUS_ID_NOT_MATCH 7 // 请求的舵机ID跟反馈回来的舵机ID不匹配
+#define FSUS_STATUS_SUCCESS 0               // Set/read success
+#define FSUS_STATUS_FAIL 1                  // Set/read failure
+#define FSUS_STATUS_TIMEOUT 2               // Wait timeout
+#define FSUS_STATUS_WRONG_RESPONSE_HEADER 3 // Wrong response header
+#define FSUS_STATUS_UNKOWN_CMD_ID 4         // Unknown control command
+#define FSUS_STATUS_SIZE_TOO_BIG 5          // Parameter size exceeds the limit in FSUS_PACK_RESPONSE_MAX_SIZE
+#define FSUS_STATUS_CHECKSUM_ERROR 6        // Checksum error
+#define FSUS_STATUS_ID_NOT_MATCH 7          // Requested servo ID does not match the feedback servo ID
 ```
 
-### 4.2.例程-检测舵机是否在线
+### 4.2 Example – Check if Servo is Online
 
-**功能简介**
+**Function description**
 
-持续向0号舵机发送通信检测指令，并且根据0号舵机的响应情况在日志输出串口打印提示信息。
+Continuously sends a `Ping` command to `servo ID 0` and prints log messages on the logging UART according to the response.
 
-**源代码**
+**Source code**
 
 ```c
-/********************************************************
- * 测试通信检测指令，测试舵机是否在线
- ********************************************************/
-#include "stm32f10x.h"
-#include "usart.h"
-#include "sys_tick.h"
-#include "fashion_star_uart_servo.h"
+#include "fashion_star_uart_servo_examples.h"
+#include "math.h"
 
-// 使用串口1作为舵机控制的端口
-// <接线说明>
-// STM32F103 PA9(Tx)  <----> 总线伺服舵机转接板 Rx
-// STM32F103 PA10(Rx) <----> 总线伺服舵机转接板 Tx
-// STM32F103 GND 	  <----> 总线伺服舵机转接板 GND
-// STM32F103 V5 	  <----> 总线伺服舵机转接板 5V
-// <注意事项>
-// 使用前确保已设置usart.h里面的USART1_ENABLE为1
-// 设置完成之后, 将下行取消注释
-Usart_DataTypeDef* servoUsart = &usart1; 
+// Use UART1 as the servo control port
+// <Wiring Instructions>
+// STM32F103 PA9(Tx)    <----> Servo Transceiver Board Rx
+// STM32F103 PA10(Rx)   <----> Servo Transceiver Board Tx
+// STM32F103 GND        <----> Servo Transceiver Board GND
+// STM32F103 V5         <----> Servo Transceiver Board 5V
+// <Notes>
+// Make sure USART1_ENABLE is set to 1 in usart.h before use
+Usart_DataTypeDef* servo_usart = &usart1; 
 
-// 使用串口2作为日志输出的端口
-// <接线说明>
-// STM32F103 PA2(Tx) <----> USB转TTL Rx
-// STM32F103 PA3(Rx) <----> USB转TTL Tx
-// STM32F103 GND 	 <----> USB转TTL GND
-// STM32F103 V5 	 <----> USB转TTL 5V (可选)
-// <注意事项>
-// 使用前确保已设置usart.h里面的USART2_ENABLE为1
-Usart_DataTypeDef* loggingUsart = &usart2;
+// Use UART2 as the logging output port
+// <Wiring Instructions>
+// STM32F103 PA2(Tx) <----> USB-TTL Rx
+// STM32F103 PA3(Rx) <----> USB-TTL Tx
+// STM32F103 GND     <----> USB-TTL GND
+// STM32F103 V5      <----> USB-TTL 5V (optional)
+Usart_DataTypeDef* logging_usart = &usart2;
 
-// 重定向c库函数printf到串口，重定向后可使用printf函数
+
+// Redirect C library function printf to UART, after redirection you can use printf function
 int fputc(int ch, FILE *f)
 {
-	while((loggingUsart->pUSARTx->SR&0X40)==0){}
-	/* 发送一个字节数据到串口 */
-	USART_SendData(loggingUsart->pUSARTx, (uint8_t) ch);
-	/* 等待发送完毕 */
-	// while (USART_GetFlagStatus(USART1, USART_FLAG_TC) != SET);		
-	return (ch);
+    while((logging_usart->pUSARTx->SR&0X40)==0){}
+    /* Send one byte of data to UART */
+    USART_SendData(logging_usart->pUSARTx, (uint8_t) ch);
+    /* Wait for transmission to complete */
+    // while (USART_GetFlagStatus(USART1, USART_FLAG_TC) != SET);       
+    return (ch);
 }
 
-// 连接在转接板上的总线伺服舵机ID号
-uint8_t servoId = 0; 
-// 发送Ping请求的状态码
-FSUS_STATUS statusCode; 
 
-int main (void)
+/* Servo Communication Test */
+void FSUSExample_PingServo(void)
 {
-	// 嘀嗒定时器初始化
-	SysTick_Init();
-	// 串口初始化
-	Usart_Init();
-	
+
+	FSUS_STATUS status_code; // Status code
+	uint8_t servo_id = 0;	 // Servo ID = 0
+
+	printf("===Test Uart Servo Ping===r\n");
 	while (1)
-    {	
-		printf("\r\n");
-		// Ping一下舵机
-		printf("[INFO]ping servo %d \r\n", servoId);
-		statusCode = FSUS_Ping(servoUsart, servoId);
-		printf("[INFO]status code %d \r\n", statusCode);
-		
-		// 根据状态码做不同的处理
-		if (statusCode == FSUS_STATUS_SUCCESS){
-			printf("[INFO]ping success, servo %d echo \r\n", servoId);
-		}else{
-			printf("[ERROR]ping fail, servo %d not online \r\n", servoId);
+	{
+		// Servo communication test
+		status_code = FSUS_Ping(servo_usart, servo_id);
+		if (status_code == FSUS_STATUS_SUCCESS)
+		{
+			printf("Servo Online \r\n");
 		}
-		// 等待1000ms
+		else
+		{
+			printf("Servo Offline,Error Code=%d \r\n", status_code);
+		}
+		// Delay for 1s
 		SysTick_DelayMs(1000);
-    }
+	}
 }
 ```
 
 
 
-## 5.单圈角度控制
+## 5.Single-Turn Position Control
 
-</td></tr></table><table><tr><td bgcolor=#DDDDDD>
+> [!NOTE]
+>
+> - The servo only responds to the latest angle control command.
+>   If you need multiple commands in sequence, use delays or read the current angle to check whether the previous action has finished.
+>
+> - When continuously sending commands to the same servo, we recommend a command interval of at least `10 ms`.
+>
+> - If `power = 0` or power is greater than the holding power value, the servo uses the holding power value. The holding power value can be configured in the **PC configuration tool**.
+>
+> - Maximum achievable speed depends on servo model and load.
 
-**注意事项：**
+### 5.1 Single-Turn Position Control (Basic)
 
-- 舵机只会响应最新的角度控制指令。当需要连续执行多个角度控制命令时，可以在程序中使用延时或者读取角度来判断上一个命令是否完成。
-- 建议连续发送指令给同一个舵机时，指令间隔在10ms以上。
-- 若power = 0或者大于功率保持值，按照功率保持值执行。功率保持值可在上位机进行设置。
-- 舵机的最大旋转速度因舵机型号、负载情况而异。
+<img src="./images/5_1.png" style="zoom:33%;" />
 
-</td></tr></table>
-
-### 5.1.简易角度控制
-
-![](./images/5_1.png)
-
-**函数原型**
+**Source code**
 
 ```c
 FSUS_STATUS FSUS_SetServoAngle(Usart_DataTypeDef *usart, uint8_t servo_id, float angle, uint16_t interval, uint16_t power, uint8_t wait);
 ```
 
-* `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
-* `servo_id` 舵机的ID
-* `angle` 舵机的目标角度，最小单位 0.1°，取值范围 [-180.0, 180.0] 
-* `interval` 舵机的运行时间，单位ms，最小值 > 100
-* `power` 舵机执行功率，单位mV，默认为0
-* `wait` API是否为阻塞式；`0`：不阻塞，`1`：等待舵机旋转到特定的位置
+* `usart`: UART data object for servo control`Usart_DataTypeDef`
+* `servo_id`: Servo ID
+* `angle`: Target angle in degrees, resolution 0.1°, range [-180.0, 180.0]
+* `interval`: Motion duration in `ms`; minimum > 100
+* `power`: Servo drive power in mV; default 0
 
-**使用示例**
+### 5.2 Single-Turn Position Control (Advanced-Time-based)
 
-```c
-// 舵机控制相关的参数
+<img src="./images/5_2.png" style="zoom: 33%;" />
 
-uint8_t servoId = 0;  // 舵机的ID号
-float angle = 0;// 舵机的目标角度  舵机角度在-180度到180度之间, 最小单位0.1°
-uint16_t interval = 2000; // 运行时间ms  可以尝试修改设置更小的运行时间，例如500ms
-uint16_t power = 0; // 舵机执行功率 单位mV 默认为0   
-uint8_t wait = 0; //  API是否为阻塞式，0:不等待 1:等待舵机旋转到特定的位置; 
-
-FSUS_SetServoAngle(servoUsart, servoId, angle, interval, power, wait);
-```
-
-
-
-### 5.2.带加减速的角度控制(指定周期)
-
-![](./images/5_2.png)
-
-**函数原型**
+**Source code**
 
 ```c
 FSUS_STATUS FSUS_SetServoAngleByInterval(Usart_DataTypeDef *usart, uint8_t servo_id, \
@@ -464,57 +404,19 @@ FSUS_STATUS FSUS_SetServoAngleByInterval(Usart_DataTypeDef *usart, uint8_t servo
                 uint16_t t_dec, uint16_t  power, uint8_t wait);
 ```
 
+- `usart`: UART data object for servo control`Usart_DataTypeDef`
+- `servo_id`: Servo ID
+- `angle`: Target angle in degrees, resolution 0.1°, range [-180.0, 180.0]
+- `interval`: Motion duration in `ms`; Must satisfy interval > `t_acc + t_dec`, and must be > `100`
+- `t_acc`: The time for the servo to accelerate from startup to constant speed (ms), with a minimum value > 20.
+- `t_dec`: The deceleration time of the servo when approaching the target position (ms), with a minimum value > 20.
+- `power`: Servo drive power in mV; default 0
 
+### 5.3 Single-Turn Position Control (Advanced-Speed-based)
 
-* `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
+<img src="./images/5_3.png" style="zoom: 33%;" />
 
-* `servo_id` 舵机的ID
-
-* `angle` 舵机的目标角度，最小单位 0.1°，取值范围 [-180.0, 180.0] 
-
-* `interval` 舵机的运行时间，单位ms，取值须 > `t_acc` + `t_dec`，最小值 > 100
-
-* `t_acc` 舵机启动到匀速的时间，单位ms，最小值 > 20
-
-* `t_dec` 舵机接近目标角度时的减速时间，单位ms，最小值 > 20
-
-* `power` 舵机执行功率，单位mV，默认为0
-
-* `wait` API是否为阻塞式；`0`：不阻塞，`1`：等待舵机旋转到特定的位置
-
-  
-
-**使用示例**
-
-```c
-//// 舵机控制相关的参数
-// 舵机的ID号
-uint8_t servoId = 0;  
-// 舵机的目标角度
-// 舵机角度在-180度到180度之间, 最小单位0.1°
-float angle = 0; 
-// 运行时间ms  
-// 可以尝试修改设置更小的运行时间，例如500ms
-uint16_t interval = 2000; 
-// 加速时间
-uint16_t t_acc = 100;
-// 减速时间
-uint16_t t_dec = 150;
-// 舵机执行功率 单位mV 默认为0   
-uint16_t power = 0;
- //  API是否为阻塞式，0:不等待 1:等待舵机旋转到特定的位置; 
-uint8_t wait = 0; 
-
-FSUS_SetServoAngleByInterval(servo_usart, servo_id, angle, interval, t_acc, t_dec, power, wait);
-```
-
-
-
-### 5.3.带加减速的角度控制(指定转速)
-
-![](./images/5_3.png)
-
-**函数原型**
+**Source code**
 
 ```c
 FSUS_STATUS FSUS_SetServoAngleByVelocity(Usart_DataTypeDef *usart, uint8_t servo_id, \
@@ -522,69 +424,28 @@ FSUS_STATUS FSUS_SetServoAngleByVelocity(Usart_DataTypeDef *usart, uint8_t servo
                 uint16_t t_dec, uint16_t  power, uint8_t wait);
 ```
 
-* `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
-* `servo_id` 舵机的ID
-* `angle` 舵机的目标角度，最小单位 0.1°，取值范围 [-180.0, 180.0] 
-* `velocity` 舵机目标转速，单位°/s，取值范围 [1 ,750] 
-* `t_acc` 舵机启动到匀速的时间，单位ms，最小值 > 20
-* `t_dec` 舵机接近目标角度时的减速时间，单位ms，最小值 > 20
-* `power` 舵机执行功率，单位mV，默认为0
-* `wait` API是否为阻塞式；`0`：不阻塞，`1`：等待舵机旋转到特定的位置
+* `usart`: UART data object for servo control`Usart_DataTypeDef`
+* `servo_id`: Servo ID
+* `angle`: Target angle in degrees, resolution 0.1°, range [-180.0, 180.0]
+* `velocity`: Target rotational speed of the servo, in degrees per second (°/s), with a value range of [1, 750].
+* `t_acc`: The time for the servo to accelerate from startup to constant speed (ms), with a minimum value > 20.
+* `t_dec`: The deceleration time of the servo when approaching the target position (ms), with a minimum value > 20.
+* `power`: Servo drive power in mV; default 0
 
+### 5.4 Read Single-Turn Current Position
 
-
-**使用示例**
-
-```c
-//// 舵机控制相关的参数
-// 舵机的ID号
-uint8_t servoId = 0;  
-// 舵机的目标角度
-// 舵机角度在-180度到180度之间, 最小单位0.1°
-float angle = 0; 
-// 目标转速
-float velocity;
-// 加速时间
-uint16_t t_acc = 100;
-// 减速时间
-uint16_t t_dec = 150;
-// 舵机执行功率 单位mV 默认为0   
-uint16_t power = 0;
- //  API是否为阻塞式，0:不等待 1:等待舵机旋转到特定的位置; 
-uint8_t wait = 0; 
-
-FSUS_SetServoAngleByVelocity(servo_usart, servo_id, angle, velocity, t_acc, t_dec, power, wait);
-```
-
-
-
-### 5.4.当前角度查询
-
-**函数原型**
+**Source code**
 
 ```c
-// 查询单个舵机的角度信息 angle 单位度
+// Query the angle information of a single servo angle unit degree
 FSUS_STATUS FSUS_QueryServoAngle(Usart_DataTypeDef *usart, uint8_t servo_id, float *angle);
 ```
 
-* `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
-* `servo_id` 舵机的ID
-* `angle` 舵机当前的角度存放指针
-
-
-
-**使用示例**
-
-```c
-uint8_t servoId = 0;    // 舵机的ID号
-float curAngle = 0;     // 舵机当前所在的角度
-FSUS_QueryServoAngle(servoUsart, servoId, &curAngle); // 读取一下舵机的角度
-//curAngle = 当前单圈角度
-```
+* `usart` : UART data object for servo control`Usart_DataTypeDef`
+* `servo_id`: Servo ID
+* `angle` :Output pointer for current single-turn angle
 
 ### 5.5.例程-控制单个舵机
-
-
 
 **功能简介**
 
